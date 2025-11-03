@@ -2,9 +2,13 @@
     <head>
         <!--HTML file auto generated using EmulatorJS codehelper-->
         <style>
-            body, html {
+            html, body {
                 margin: 0;
                 padding: 0;
+                height: 100vh;
+                display: flex;
+                flex-direction: column;
+                font-family: Arial, sans-serif;
             }
             #game-selector {
                 display: flex;
@@ -13,6 +17,7 @@
                 padding: 10px;
                 background-color: #f0f0f0;
                 border-bottom: 1px solid #ccc;
+                flex: none;
             }
             #game-selector button {
                 padding: 8px 16px;
@@ -29,33 +34,94 @@
             #game-selector button.active {
                 background-color: #004494;
             }
+            #content {
+                flex: 1;
+                position: relative;
+                overflow: hidden;
+            }
+            #preview-container {
+                width: 100%;
+                height: 100%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                background-color: #f8f8f8;
+            }
+            #preview-container img {
+                max-width: 100%;
+                max-height: 100%;
+                width: auto;
+                height: auto;
+                object-fit: contain;
+            }
+            #game-container {
+                width: 100%;
+                height: 100%;
+                display: none;
+            }
         </style>
     </head>
     <body>
         <div id="game-selector">
-            <button onclick="switchGame('1.gb', 'Tetris')" class="active">Tetris</button>
-            <button onclick="switchGame('2.gb', 'Game 2')">Super Mario Land</button>
-            <button onclick="switchGame('3.gb', 'Game 3')">Asteroids</button>
-            <button onclick="switchGame('4.gb', 'Game 4')">GTA 2</button>
+            <button onclick="switchGame('1.gb', 'Tetris')" 
+                    data-preview="https://via.placeholder.com/800x400/0064ff/ffffff?text=Tetris+Preview"
+                    onmouseover="updatePreview(this.dataset.preview)" 
+                    class="active">Tetris</button>
+            <button onclick="switchGame('2.gb', 'Super Mario Land')" 
+                    data-preview="https://via.placeholder.com/800x400/ff69b4/ffffff?text=Super+Mario+Land+Preview"
+                    onmouseover="updatePreview(this.dataset.preview)">Super Mario Land</button>
+            <button onclick="switchGame('3.gb', 'Asteroids')" 
+                    data-preview="https://via.placeholder.com/800x400/000080/ffffff?text=Asteroids+Preview"
+                    onmouseover="updatePreview(this.dataset.preview)">Asteroids</button>
+            <button onclick="switchGame('4.gb', 'GTA 2')" 
+                    data-preview="https://via.placeholder.com/800x400/8b0000/ffffff?text=GTA+2+Preview"
+                    onmouseover="updatePreview(this.dataset.preview)">GTA 2</button>
         </div>
-        <div style="width:100%;height:100%;max-width:100%">
-            <div id="game"></div>
+        <div id="content">
+            <div id="preview-container">
+                <img id="preview-img" src="https://via.placeholder.com/800x400/0064ff/ffffff?text=Tetris+Preview" alt="Game Preview">
+            </div>
+            <div id="game-container">
+                <div id="game"></div>
+            </div>
         </div>
         <script>
-            // Function to switch games: updates config and reloads page
+            // Function to update preview image on hover
+            function updatePreview(src) {
+                document.getElementById('preview-img').src = src;
+            }
+
+            // Function to switch games: saves selection and reloads page
             function switchGame(gameUrl, gameName) {
-                EJS_gameUrl = gameUrl;
-                EJS_gameName = gameName + '-USA[V1]';  // Customize the suffix if needed
+                localStorage.setItem('selectedGame', JSON.stringify({url: gameUrl, name: gameName}));
                 location.reload();
             }
+
+            // On page load, check for saved game and configure accordingly
+            window.addEventListener('load', function() {
+                const saved = localStorage.getItem('selectedGame');
+                const previewContainer = document.getElementById('preview-container');
+                const gameContainer = document.getElementById('game-container');
+
+                if (saved) {
+                    const data = JSON.parse(saved);
+                    EJS_gameUrl = data.url;
+                    EJS_gameName = data.name + '-USA[V1]';
+                    previewContainer.style.display = 'none';
+                    gameContainer.style.display = 'block';
+                } else {
+                    previewContainer.style.display = 'flex';
+                    gameContainer.style.display = 'none';
+                }
+            });
         </script>
         <script>
+            // Always set these emulator config vars (core, player, etc.)
             EJS_player = "#game";
             EJS_core = "gb";
-            EJS_gameName = "GB_sav-state";
             EJS_color = "#0064ff";
             EJS_pathtodata = "https://cdn.emulatorjs.org/stable/data/";
-            EJS_gameUrl = "Tetris (JUE) (V1.0) [!].gb";
+            // EJS_gameUrl and EJS_gameName set conditionally above
         </script>
         <script src="https://cdn.emulatorjs.org/stable/data/loader.js"></script>
     </body>
