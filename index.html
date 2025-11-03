@@ -65,16 +65,20 @@
         <div id="game-selector">
             <button data-url="1.gb" 
                     data-preview="https://via.placeholder.com/800x400/0064ff/ffffff?text=Tetris+Preview"
+                    onclick="switchGame(this.dataset.url, this.textContent.trim())"
                     onmouseover="updatePreview(this.dataset.preview)" 
                     class="active">Tetris</button>
             <button data-url="2.gb" 
                     data-preview="https://via.placeholder.com/800x400/ff69b4/ffffff?text=Super+Mario+Land+Preview"
+                    onclick="switchGame(this.dataset.url, this.textContent.trim())"
                     onmouseover="updatePreview(this.dataset.preview)">Super Mario Land</button>
             <button data-url="3.gb" 
                     data-preview="https://via.placeholder.com/800x400/000080/ffffff?text=Asteroids+Preview"
+                    onclick="switchGame(this.dataset.url, this.textContent.trim())"
                     onmouseover="updatePreview(this.dataset.preview)">Asteroids</button>
             <button data-url="4.gb" 
                     data-preview="https://via.placeholder.com/800x400/8b0000/ffffff?text=GTA+2+Preview"
+                    onclick="switchGame(this.dataset.url, this.textContent.trim())"
                     onmouseover="updatePreview(this.dataset.preview)">GTA 2</button>
         </div>
         <div id="content">
@@ -103,6 +107,7 @@
                 const saved = localStorage.getItem('selectedGame');
                 const previewContainer = document.getElementById('preview-container');
                 const gameContainer = document.getElementById('game-container');
+                const gameSelector = document.getElementById('game-selector');
                 const buttons = document.querySelectorAll('#game-selector button');
 
                 // Remove active from all buttons
@@ -114,8 +119,9 @@
                     EJS_gameName = data.name + '-USA[V1]';
                     previewContainer.style.display = 'none';
                     gameContainer.style.display = 'block';
+                    gameSelector.style.display = 'none';  // Hide buttons once game starts
 
-                    // Set active button based on URL
+                    // Set active button based on URL (for future reference, though hidden)
                     const activeBtn = Array.from(buttons).find(btn => btn.dataset.url === EJS_gameUrl);
                     if (activeBtn) {
                         activeBtn.classList.add('active');
@@ -129,6 +135,7 @@
                     // Menu mode: show preview, hide game, set default active button
                     previewContainer.style.display = 'flex';
                     gameContainer.style.display = 'none';
+                    gameSelector.style.display = 'flex';  // Ensure visible in menu
                     buttons[0].classList.add('active');  // Default to Tetris
                 }
             });
