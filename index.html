@@ -63,17 +63,17 @@
     </head>
     <body>
         <div id="game-selector">
-            <button onclick="switchGame('1.gb', 'Tetris')" 
+            <button data-url="1.gb" 
                     data-preview="https://via.placeholder.com/800x400/0064ff/ffffff?text=Tetris+Preview"
                     onmouseover="updatePreview(this.dataset.preview)" 
                     class="active">Tetris</button>
-            <button onclick="switchGame('2.gb', 'Super Mario Land')" 
+            <button data-url="2.gb" 
                     data-preview="https://via.placeholder.com/800x400/ff69b4/ffffff?text=Super+Mario+Land+Preview"
                     onmouseover="updatePreview(this.dataset.preview)">Super Mario Land</button>
-            <button onclick="switchGame('3.gb', 'Asteroids')" 
+            <button data-url="3.gb" 
                     data-preview="https://via.placeholder.com/800x400/000080/ffffff?text=Asteroids+Preview"
                     onmouseover="updatePreview(this.dataset.preview)">Asteroids</button>
-            <button onclick="switchGame('4.gb', 'GTA 2')" 
+            <button data-url="4.gb" 
                     data-preview="https://via.placeholder.com/800x400/8b0000/ffffff?text=GTA+2+Preview"
                     onmouseover="updatePreview(this.dataset.preview)">GTA 2</button>
         </div>
@@ -96,12 +96,17 @@
                 localStorage.setItem('selectedGame', JSON.stringify({url: gameUrl, name: gameName}));
                 location.reload();
             }
-
+        </script>
+        <script>
             // On page load, check for saved game and configure accordingly
             window.addEventListener('load', function() {
                 const saved = localStorage.getItem('selectedGame');
                 const previewContainer = document.getElementById('preview-container');
                 const gameContainer = document.getElementById('game-container');
+                const buttons = document.querySelectorAll('#game-selector button');
+
+                // Remove active from all buttons
+                buttons.forEach(btn => btn.classList.remove('active'));
 
                 if (saved) {
                     const data = JSON.parse(saved);
@@ -109,9 +114,22 @@
                     EJS_gameName = data.name + '-USA[V1]';
                     previewContainer.style.display = 'none';
                     gameContainer.style.display = 'block';
+
+                    // Set active button based on URL
+                    const activeBtn = Array.from(buttons).find(btn => btn.dataset.url === EJS_gameUrl);
+                    if (activeBtn) {
+                        activeBtn.classList.add('active');
+                    }
+
+                    // Dynamically load the EmulatorJS loader only when a game is selected
+                    const script = document.createElement('script');
+                    script.src = 'https://cdn.emulatorjs.org/stable/data/loader.js';
+                    document.head.appendChild(script);
                 } else {
+                    // Menu mode: show preview, hide game, set default active button
                     previewContainer.style.display = 'flex';
                     gameContainer.style.display = 'none';
+                    buttons[0].classList.add('active');  // Default to Tetris
                 }
             });
         </script>
@@ -121,8 +139,7 @@
             EJS_core = "gb";
             EJS_color = "#0064ff";
             EJS_pathtodata = "https://cdn.emulatorjs.org/stable/data/";
-            // EJS_gameUrl and EJS_gameName set conditionally above
+            // EJS_gameUrl and EJS_gameName are set conditionally in the load event above
         </script>
-        <script src="https://cdn.emulatorjs.org/stable/data/loader.js"></script>
     </body>
 </html>
